@@ -87,3 +87,99 @@ We defined the objectives of the survey:
 - **Performance** – Quick summarization and chatbot responses for small documents  
 - **Scalability** – Limited user support for testing (not full real-time availability yet)  
 - **Trust** – Show clear, simple explanations and basic lawyer details (name, expertise)  
+
+# Survey Responses
+
+We took a comprehensive survey via a Google Form, which was filled by **100+ participants**.  
+The summary of the survey is presented below, with charts/graphs attached.
+
+---
+
+## Age Distribution
+The survey was filled by people ranging from ages **17 to 58**, with maximum participants in the **19–20** and **53–56** age groups.
+
+![Age Distribution](images/age_distribution.png)
+
+---
+
+## Profession Split
+There was a roughly even split between **working professionals** and **students**.  
+(*Note: Both red and yellow in the chart represent working professionals – a spelling error caused duplication.*)
+
+![Profession Split](images/profession_split.png)
+
+---
+
+## Understanding Legal Documents
+A **majority of participants** find it *somewhat difficult* to understand legal documents.
+
+![Difficulty Understanding](images/difficulty_understanding.png)
+
+---
+
+## Use of Online Legal Assistance Tools
+Most people had **never used an online legal assistance tool**.
+
+![Online Tools Usage](images/online_tools_usage.png)
+
+---
+
+## Summarisation Feature
+Most respondents felt that a **document summarisation feature** would be useful.
+
+![Summarisation Feature](images/summarisation_feature.png)
+
+---
+
+## Common Document Types
+The majority of people deal with **Contracts & Agreements**.
+
+![Document Types](images/document_types.png)
+
+---
+
+## AI Highlighting Feature
+Most people were in favour of **AI that highlights risks, obligations, and key clauses**.  
+No one was against it.
+
+![AI Highlights](images/ai_highlights.png)
+
+---
+
+## Lawyer Connection Preferences
+There was a **split opinion** on whether to connect directly with a lawyer after reviewing the AI summary.  
+Many preferred an **audio call** to connect with the lawyer.
+
+![Lawyer Connection](images/lawyer_connection.png)
+
+**Influencing factors** in choosing a lawyer:  
+- Area of expertise  
+- Years of experience  
+- Fees  
+
+---
+
+## Personalised Dashboard
+More than a quarter of people felt the need for a **dashboard** to track uploaded documents, summaries, and consultations.
+
+![Dashboard Need](images/dashboard.png)
+
+---
+
+## Chatbot Usage
+There was a **split opinion** on willingness to ask a **chatbot** for basic legal questions.
+
+![Chatbot Usage](images/chatbot_usage.png)
+
+---
+
+## Step-by-Step Assistance
+Many felt that **step-by-step assistance for simple legal tasks** would be the most useful feature.
+
+![Step by Step Assistance](images/step_assistance.png)
+
+---
+
+# Conclusion
+The survey highlights the **demand for AI-driven tools** that simplify legal documents, provide actionable insights, and offer direct lawyer connectivity where needed.  
+A combination of **AI-powered summarisation, clause highlighting, personalised dashboards, and step-by-step guidance** is likely to be the most impactful solution.
