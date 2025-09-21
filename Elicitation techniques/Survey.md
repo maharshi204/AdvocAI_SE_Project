@@ -88,6 +88,18 @@ We defined the objectives of the survey:
 - **Scalability** – Limited user support for testing (not full real-time availability yet)  
 - **Trust** – Show clear, simple explanations and basic lawyer details (name, expertise)  
 
+## User Stories 
+
+# User Stories
+
+| Front | Back (Acceptance Criteria) |
+|-------|-----------------------------|
+| **As a non professional user, I want** the facility to summarise general contracts and agreements, real estate and property related documents, business contracts, application forms and employment/HR documents **so that** I can easily understand them without wasting time going through them. | 1. User can upload contracts, real estate/property docs, business contracts, application forms and HR/employment docs.<br>2. System generates a concise summary in plain, jargon-free language.<br>3. File format should be Word or PDF.<br>4. Summary is generated within a reasonable time, say 5 minutes.<br>5. A disclaimer to further consult a lawyer before proceeding with AI’s understanding of the document. |
+| **As a non professional user, I want** to be able to connect and communicate to a lawyer via chat service, audio or video call or email after generating the AI summary, **so that** I can feel secure about proceeding with the document. | 1. Users should be able to see an option to connect with a lawyer.<br>2. User can choose between multiple communication modes:<br>&nbsp;&nbsp;&nbsp;• Chat service<br>&nbsp;&nbsp;&nbsp;• Audio call<br>&nbsp;&nbsp;&nbsp;• Video call<br>&nbsp;&nbsp;&nbsp;• Email<br>3. System shows available lawyers before the user initiates contact.<br>4. Lawyer must request user’s permission to view the document if it is set to be viewed with access. If set as “anyone can view”, then the Lawyer can click on a user’s document to see it.<br>5. User receives confirmation that the lawyer has accepted or scheduled the session. |
+
+
+
+
 # Survey Responses
 
 We took a comprehensive survey via a Google Form, which was filled by **100+ participants**.  
