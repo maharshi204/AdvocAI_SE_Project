@@ -61,4 +61,95 @@ After studying these systems, we observed:
 1. High accuracy clause extraction and summarization.    
 2. Stable and reliable performance, even with large contracts.  
 3. Secure platform.  
-4. Scalable to support multiple users and documents.  
+4. Scalable to support multiple users and documents.
+
+# User Stories
+
+
+## Story 1
+
+**Front of the card:**  
+As a small business owner, I’d like to upload my contract and receive a plain English summary so that I can read it myself without requiring a lawyer for every little thing.
+
+**Back of the card:**  
+- The system should allow uploading documents in PDF/Word formats.  
+- The system should generate a clear, simplified summary.  
+- Summary must retain critical details such as dates, obligations, and penalties.
+
+
+## Story 2
+
+**Front of the card:**  
+As a startup founder, I’d like uncertain or risky terms highlighted so I don’t inadvertently sign on to damaging conditions.
+
+**Back of the card:**  
+- The system should flag ambiguous or high-risk clauses.  
+- Highlighted clauses must be clearly visible.  
+- Users should receive a short explanation of why the clause was flagged.
+
+
+## Story 3
+
+**Front of the card:**  
+As a compliance officer, I’d like version tracking and comments so my team can stay in sync on legal reviews.
+
+**Back of the card:**  
+- The system should store and display different versions of documents.  
+- Users should be able to compare changes between versions.  
+- Threaded comments must be linked to specific sections of the document.
+
+
+## Story 4
+
+**Front of the card:**  
+As a user, I want to ask a chatbot direct questions like “What’s the renewal date?” so I don’t have to read the whole contract.
+
+**Back of the card:**  
+- Chatbot should provide contextually accurate answers from the document.  
+- If the chatbot can’t answer, it should suggest alternative actions (manual search or lawyer consultation).  
+- Answers should reference the original clause for transparency.
+
+
+## Story 5
+
+**Front of the card:**  
+As a client, I want the option to connect with a lawyer directly when the AI’s explanation isn’t enough, so I feel more secure before signing.
+
+**Back of the card:**  
+- System must provide a “Connect with Lawyer” feature.  
+- Lawyers should receive the client’s query along with relevant document context.  
+- Communication must be secure, supporting chat or call options.  
+- Lawyer responses should be logged for traceability and follow-up.
+  
+
+## Story 6
+
+**Front of the card:**  
+As a member of the legal team, I’d like comment threads that are collaborative so I and my team members can comment easily on certain sections of a contract.
+
+**Back of the card:**  
+- Users should be able to tag specific sections of the document for discussion.  
+- Comment threads must support replies, mentions, and notifications.  
+- All comments should be version-controlled and stored securely.
+
+
+## Story 7
+
+**Front of the card:**  
+As a user, I’d like e-signature capabilities so that I can sign agreements within the same system.
+
+**Back of the card:**  
+- System must integrate with legally compliant e-signature services.  
+- Signed documents must be securely stored and linked to the original document version.  
+- Users should receive confirmation after signing.
+
+## Story 8
+
+**Front of the card:**  
+As an attorney, I’d like clients’ questions sent to me through the system so I can respond quickly and effectively.
+
+**Back of the card:**  
+- Lawyers should receive notifications when clients submit queries.  
+- System should display the relevant document context to the lawyer.  
+- Lawyers’ responses must be secure and logged for accountability.
+  
