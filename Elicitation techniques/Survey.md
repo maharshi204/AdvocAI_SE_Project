@@ -195,3 +195,120 @@ Many felt that **step-by-step assistance for simple legal tasks** would be the m
 # Conclusion
 The survey highlights the **demand for AI-driven tools** that simplify legal documents, provide actionable insights, and offer direct lawyer connectivity where needed.  
 A combination of **AI-powered summarisation, clause highlighting, personalised dashboards, and step-by-step guidance** is likely to be the most impactful solution.
+
+# Analysis of User Responses on Advoc AI
+
+## Q1: What challenges do you currently face in accessing legal help?
+
+### Findings
+Users face multiple pain points when dealing with legal services. The key challenges can be categorized as follows:
+
+#### Accessibility Issues
+- Difficulty in finding the right lawyer with relevant expertise.
+- Problems with availability and scheduling of appointments.
+- Long waiting times and time-consuming legal procedures.
+
+#### Knowledge & Comprehension Gaps
+- Struggle to understand complex legal terminology and jargon.
+- Lack of awareness about required documents and updated government rules.
+- Confusion due to inconsistent or conflicting advice from different lawyers.
+
+#### Trust & Security Concerns
+- Fear of encountering fake or untrustworthy lawyers.
+- Concerns about data security when uploading documents online.
+- Skepticism about whether legal advice will be accurate and reliable.
+
+#### Cost & Resource Constraints
+- High consultation fees, even for minor advice.
+- Perception of wasted money, time, and effort due to inefficiencies.
+
+#### Process Inefficiencies
+- Difficulty in document preparation, digital signatures, and filing.
+- Losing track of deadlines, updates, or required procedures.
+- Stressful, tedious, and often frustrating user experience.
+
+### Software Engineering Viewpoint
+- These insights highlight user pain points (problem domain analysis).
+- The challenges indicate a strong need for requirement-driven solutions focusing on usability, accessibility, security, and cost-effectiveness.
+- The diversity of responses shows the importance of requirements elicitation from real users before system design.
+
+---
+
+## Q2: What features would make you trust an AI-powered legal assistant more?
+
+### Findings
+Users expressed both expectations and skepticism. The key trust-building features are:
+
+#### Transparency & Verification
+- Clear references to legal sources (e.g., government portals, constitution articles).
+- Verification or certification by experienced human lawyers.
+- Proof, citations, or statistics supporting the advice.
+
+#### Privacy & Security
+- Strong protection of sensitive personal data (no misuse, no third-party access).
+- Options to delete files and chat history after usage.
+- Explicit user consent before data is reviewed by others.
+
+#### Simplicity & Comprehension
+- Explanations in plain, layman-friendly language.
+- Step-by-step guidance on processes, required documents, and next steps.
+- Avoidance of heavy legal jargon.
+
+#### Reliability & Context Awareness
+- Updated legal knowledge according to region, state, or country.
+- Ability to highlight when human lawyer involvement is required.
+- Summaries of pros/cons, risks, and possible outcomes.
+
+#### User Experience
+- Ease of use, fast responses, and accessible interface.
+- Interactive, personalized guidance for specific legal issues.
+
+### Software Engineering Viewpoint
+- These responses reflect non-functional requirements like security, reliability, transparency, and usability.
+- Skepticism shows a need for validation mechanisms, such as human-in-the-loop design where AI advice can be reviewed by a professional.
+- Trust is not only a technical quality attribute but also an ethical requirement for AI-based systems.
+
+---
+
+## Q3: Any additional suggestions or expectations you have from Advoc AI?
+
+### Findings
+The suggestions provide insights into future enhancements and feature expectations:
+
+#### Data Privacy as the Foundation
+- Strong emphasis on safeguarding sensitive personal, business, and financial data.
+- Avoiding misuse of identification details (e.g., Aadhaar, PAN).
+- Ethical handling of confidential cases (e.g., family disputes, domestic violence).
+
+#### Feature Enhancements
+- Voice-based interaction for easier queries.
+- Automated drafting of legal documents (in multiple formats and languages).
+- Notifications for document expirations and deadlines.
+- Guidance on licenses and compliance for new businesses.
+
+#### Contextual & Human-Aware Assistance
+- AI should explain the legal reasoning behind its advice (laws, sections, references).
+- Support multi-language features for inclusivity.
+- Sensitivity to emotional and situational aspects (e.g., victim safety in disputes).
+
+#### Continuous Improvement & Reliability
+- Regular updates to legal knowledge as laws evolve.
+- Testing for bias and errors to ensure fairness.
+- Providing case-based examples and step-by-step assistance.
+
+### Software Engineering Viewpoint
+- These inputs represent evolutionary requirements (future scope for system growth).
+- Strong user demand for non-functional qualities like privacy, transparency, usability, adaptability, and ethical AI design.
+- Expectations highlight the importance of requirements validation and iterative development to align the product with real-world user needs.
+
+---
+
+## Overall Analysis
+- **Problem Space:** Legal services are currently expensive, time-consuming, complex, and untrustworthy for many users.
+- **Requirement Space:** Users want Advoc AI to be secure, simple, transparent, and context-aware.
+- **Quality Attributes:** The system must focus on privacy, accuracy, usability, reliability, and ethics to gain user trust.
+- **Risks:** Skepticism remains high — many users believe AI cannot fully replace lawyers, especially in sensitive or high-stakes cases.
+
+**Summary:**  
+The responses provide valuable insights for requirements engineering, guiding the design of Advoc AI towards a secure, trustworthy, and user-centered legal assistant.
+
