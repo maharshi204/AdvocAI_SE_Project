@@ -4,8 +4,6 @@ import Navbar from "./Components/Navbar/Navbar";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import Chatbot from "./pages/Chatbot";
-import Summary from "./pages/Summary";
 import Lawyers from "./pages/Lawyers";
 import DocumentAnalyzer from "./pages/DocumentAnalyzer";
 import DocumentCreation from "./pages/DocumentCreation";
@@ -30,8 +28,6 @@ function AppContent() {
           <Route path="/document-creation" element={<DocumentCreation />} />
           <Route path="/lawyer-connect" element={<LawyerConnect />} />
           <Route path="/my-documents" element={<MyDocuments />} />
-          <Route path="/chatbot" element={<Chatbot />} />
-          <Route path="/summary" element={<Summary />} />
           <Route path="/lawyers" element={<Lawyers />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
