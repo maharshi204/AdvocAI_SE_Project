@@ -1,7 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { FileText, Users, PenTool, Brain, Upload, Search, Lightbulb, FileCheck, UserCheck } from 'lucide-react';
 
 const AdvocAILanding = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      // User is logged in, show features - scroll to features section
+      document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // User not logged in, redirect to login
+      navigate('/login');
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -16,14 +30,17 @@ const AdvocAILanding = () => {
             Transform complex legal jargon into plain English. Understand your rights,
             obligations, and risks with AI-powered analysis and expert lawyer support.
           </p>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition duration-200 transform hover:scale-105">
+          <button 
+            onClick={handleGetStarted}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition duration-200 transform hover:scale-105"
+          >
             Get Started
           </button>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h3 className="text-4xl font-bold text-center text-gray-900 mb-16">
             Powerful Features for Legal Clarity
