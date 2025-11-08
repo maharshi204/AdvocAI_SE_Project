@@ -1,0 +1,14 @@
+Django==5.2.7
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.0
+django-cors-headers==4.3.1
+google-auth==2.23.4
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.1.1
+python-dotenv==1.0.0
+mongoengine==0.29.1
+pymongo==4.10.1
+dnspython==2.4.2
+PyMuPDF==1.26.5
+python-docx==1.2.0
+langchain-google-genai==2.0.5
