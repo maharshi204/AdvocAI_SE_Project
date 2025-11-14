@@ -1,23 +1,23 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./Components/Navbar/Navbar";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import VerifyOTP from "./pages/VerifyOTP";
+import Profile from "./pages/Profile";
+
+
+import LawyerProfile from "./pages/LawyerProfile";
 import Lawyers from "./pages/Lawyers";
 import DocumentAnalyzer from "./pages/DocumentAnalyzer";
-import DocumentCreation from "./pages/DocumentCreation";
 import LawyerConnect from "./pages/LawyerConnect";
 import MyDocuments from "./pages/MyDocuments";
-
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+import DocumentCreation from "./pages/DocumentCreation";
+import SharedDocument from "./pages/SharedDocument";
 
 function AppContent() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/login', '/signup', '/verify-otp'];
+  const hideNavbarRoutes = ['/login', '/signup'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -29,39 +29,34 @@ function AppContent() {
         <main className={shouldShowNavbar ? "pt-20 bg-gray-50" : "bg-gray-50"}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/document-analyser" element={<DocumentAnalyzer />} />
+          <Route path="/document-analyzer/:id" element={<DocumentAnalyzer />} />
           <Route path="/document-creation" element={<DocumentCreation />} />
+          <Route path="/document-creation/:id" element={<DocumentCreation />} />
+          <Route path="/shared/:id" element={<SharedDocument />} />
           <Route path="/lawyer-connect" element={<LawyerConnect />} />
           <Route path="/my-documents" element={<MyDocuments />} />
+
+
+          <Route path="/lawyer-profile/:id" element={<LawyerProfile />} />
           <Route path="/lawyers" element={<Lawyers />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </main>
     </>
   );
 }
 
+import { Toaster } from 'react-hot-toast';
+
 function App() {
-  const appContent = (
+  return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <Toaster position="bottom-right" />
+      <AppContent />
     </Router>
   );
-
-  // Only wrap with GoogleOAuthProvider if client ID is available
-  if (GOOGLE_CLIENT_ID) {
-    return (
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        {appContent}
-      </GoogleOAuthProvider>
-    );
-  }
-
-  return appContent;
 }
 
 export default App;

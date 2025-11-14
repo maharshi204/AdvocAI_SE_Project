@@ -1,9 +1,3 @@
-# Environments
-.env
-
-# Dependencies
-node_modules/
-
 # Django
 db.sqlite3
 media/

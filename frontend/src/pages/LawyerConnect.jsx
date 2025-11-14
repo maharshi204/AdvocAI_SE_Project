@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LawyerConnect = () => {
+  const navigate = useNavigate();
   // Sample lawyer data - you can replace this with data from your backend
   const lawyers = Array.from({ length: 16 }, (_, index) => ({
     id: index + 1,
@@ -10,9 +12,7 @@ const LawyerConnect = () => {
   }));
 
   const handleViewProfile = (lawyerId) => {
-    console.log('Viewing profile for lawyer:', lawyerId);
-    // Here you would typically navigate to a detailed lawyer profile page
-    // or open a modal with lawyer details
+    navigate(`/lawyer-profile/${lawyerId}`);
   };
 
   return (

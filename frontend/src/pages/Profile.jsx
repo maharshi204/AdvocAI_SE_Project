@@ -30,27 +30,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-green-100">
-      {/* Navigation Header */}
-      <nav className="bg-white/80 backdrop-blur-sm border-b border-white/30 px-8 py-4">
-        <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-gray-800">
-            AdvocAI
-          </div>
-          <div className="flex items-center space-x-8">
-            <a href="/home" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">Home</a>
-            <a href="/document-analyser" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">Document Analyser</a>
-            <a href="/document-creation" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">Document Creation</a>
-            <a href="/lawyer-connect" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">Lawyer Connect</a>
-            <a href="/my-documents" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">My Documents</a>
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <div className="w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                👤
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Main Content */}
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-4xl">

@@ -8,38 +8,40 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isSignedIn = false; // mock auth state
 
-  const navLinks = [
-    { to: "/", label: "Home" },
-    { to: "/document-analyser", label: "Document Analyser" },
-    { to: "/document-creation", label: "Document Creation" },
-    { to: "/lawyer-connect", label: "Lawyer Connect" },
-    { to: "/my-documents", label: "My Documents" },
-  ];
-
-  return (
-    <>
-      {/* Navbar */}
-      <nav className="fixed rounded-xl mx-2 sm:mx-3 md:mx-4 top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm shadow-lg">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex-shrink-0 text-2xl font-bold text-gray-800">
-            AdvocAI
-          </div>
-
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex space-x-4 md:space-x-8 text-gray-700 hover:text-black font-medium">
-            {navLinks.map((link, index) => (
-              <NavItem key={index} to={link.to} label={link.label} />
-            ))}
-          </div>
-
-          {/* Desktop Auth/Profile */}
-          <div className="hidden md:flex items-center space-x-4">
-            {isSignedIn ? (
-              <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition cursor-pointer">
-                <User className="w-6 h-6 text-gray-700" />
-              </button>
-            ) : (
+      const navLinks = [
+      { to: "/", label: "Home" },
+      { to: "/document-analyser", label: "Document Analyser" },
+      { to: "/document-creation", label: "Document Creation" },
+      { to: "/lawyer-connect", label: "Lawyer Connect" },
+      { to: "/my-documents", label: "My Documents" },
+      { to: "/profile", label: "Profile" },
+    ];
+  
+    return (
+      <>
+        {/* Navbar */}
+        <nav className="fixed rounded-xl mx-2 sm:mx-3 md:mx-4 top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-sm shadow-lg">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex-shrink-0 text-2xl font-bold text-gray-800">
+              AdvocAI
+            </div>
+  
+            {/* Desktop Nav Links */}
+            <div className="hidden md:flex space-x-4 md:space-x-8 text-gray-700 hover:text-black font-medium">
+              {navLinks.map((link, index) => (
+                <NavItem key={index} to={link.to} label={link.label} />
+              ))}
+            </div>
+  
+            {/* Desktop Auth/Profile */}
+            <div className="hidden md:flex items-center space-x-4">
+              {isSignedIn ? (
+                <Link to="/profile">
+                  <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition cursor-pointer">
+                    <User className="w-6 h-6 text-gray-700" />
+                  </button>
+                </Link>            ) : (
               <Link to="/login">
                 <Button
                   variant="outline"
@@ -94,9 +96,11 @@ const Navbar = () => {
         {/* Sidebar Auth/Profile */}
         <div className="p-4 border-t mt-auto">
           {isSignedIn ? (
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition cursor-pointer">
-              <User className="w-6 h-6 text-gray-700" />
-            </button>
+            <Link to="/profile" onClick={() => setIsOpen(false)}>
+              <button className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition cursor-pointer">
+                <User className="w-6 h-6 text-gray-700" />
+              </button>
+            </Link>
           ) : (
             <Link to="/login" onClick={() => setIsOpen(false)}>
               <Button
@@ -122,3 +126,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
