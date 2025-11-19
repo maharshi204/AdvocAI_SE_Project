@@ -55,3 +55,93 @@ def conversation_list(request):
         else:
             return Response({'error': 'Failed to save conversation'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['GET', 'PUT', 'DELETE'])
+def conversation_detail(request, pk):
+    """
+    Retrieve, update or delete a single conversation.
+    """
+    if request.method == 'GET':
+        conversation = get_conversation_by_id(pk)
+        if not conversation:
+            return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        user_has_access = False
+        # 1. Check if the requesting user is the owner
+        if request.user.is_authenticated and conversation.get('owner') == request.user.username:
+            user_has_access = True
+       
+        # 2. Check public share permissions
+        share_permissions = conversation.get('share_permissions')
+        if share_permissions and share_permissions.get('permission_level') in ['view', 'edit']:
+            user_has_access = True
+
+        # 3. Check user-specific share permissions
+        if request.user.is_authenticated:
+            shared_with_users = conversation.get('shared_with_users', [])
+            for shared_user in shared_with_users:
+                if shared_user.get('username') == request.user.username:
+                    if shared_user.get('permission_level') in ['view', 'edit']:
+                        user_has_access = True
+                        break
+       
+        if not user_has_access:
+            return Response({'error': 'You do not have permission to access this document.'}, status=status.HTTP_403_FORBIDDEN)
+
+        return Response(conversation)
+   
+    elif request.method == 'PUT':
+        conversation = get_conversation_by_id(pk)
+        if not conversation:
+            return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check for share permissions
+        share_permissions = conversation.get('share_permissions')
+        if share_permissions is None:
+            share_permissions = {}
+        permission_level = share_permissions.get('permission_level')
+
+        # If the user is not authenticated, only allow updates if the permission level is 'edit'
+        if not request.user.is_authenticated and permission_level != 'edit':
+            return Response({'error': 'You do not have permission to edit this document.'}, status=status.HTTP_403_FORBIDDEN)
+
+        title = request.data.get('title')
+        messages = request.data.get('messages')
+        new_document_content = request.data.get('new_document_content')
+        notes = request.data.get('notes', f'Version update via AI editor')
+        shared_with_users = request.data.get('shared_with_users') # New: get shared_with_users
+
+        print(f"[DEBUG Backend] conversation_detail (PUT) - Received messages: {messages}")
+
+        if not title: # Title is always required for a conversation
+            return Response({'error': 'Title is required'}, status=status.HTTP_400_BAD_REQUEST)
+       
+        # Fetch existing conversation to get current messages if not provided in request
+        existing_conversation = get_conversation_by_id(pk)
+        if not existing_conversation:
+            return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+       
+        # Use existing messages if not provided in the request for a title-only update
+        messages_to_update = messages if messages is not None else existing_conversation.get('messages', [])
+
+        success = update_conversation(
+            pk,
+            title,
+            messages_to_update,
+            new_document_content,
+            uploaded_by=(request.user.username if request.user.is_authenticated else 'anonymous'),
+            notes=notes,
+            shared_with_users=shared_with_users # New: pass shared_with_users
+        )
+        if success:
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to update conversation'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == 'DELETE':
+        success = delete_conversation(pk)
+        if success:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'error': 'Failed to delete conversation'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
