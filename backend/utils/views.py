@@ -156,3 +156,48 @@ def _generate_pdf_from_markdown(markdown_content):
 
     result_file.seek(0)
     return result_file
+
+
+@api_view(['GET'])
+def download_latest_conversation_pdf(request, pk):
+    """
+    Downloads the latest document content from a conversation as a PDF.
+    """
+    conversation = get_conversation_by_id(pk)
+    if not conversation or 'document_versions' not in conversation or not conversation['document_versions']:
+        return Response({'error': 'No document content found for this conversation.'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        # Get the content of the latest version
+        latest_version_content = conversation['document_versions'][-1]['content']
+        pdf_file = _generate_pdf_from_markdown(latest_version_content)
+        
+        response = FileResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{conversation.get("title", "legal_document")}.pdf"'
+        return response
+    except Exception as e:
+        return Response({'error': f'Error generating PDF: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def download_version_pdf(request, pk, version_number):
+    """
+    Downloads a specific document version from a conversation as a PDF.
+    """
+    try:
+        conversation = get_conversation_by_id(pk)
+        if not conversation or 'document_versions' not in conversation or not conversation['document_versions']:
+            return Response({'error': 'No document versions found for this conversation.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        version = next((v for v in conversation['document_versions'] if v['version_number'] == version_number), None)
+        if not version:
+            return Response({'error': 'Version content not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        pdf_file = _generate_pdf_from_markdown(version['content'])
+        filename = f"{conversation.get("title", "legal_document")}_v{version_number}.pdf"
+        
+        response = FileResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    except Exception as e:
+        print(f"Error in download_version_pdf: {e}")
+        return Response({'error': f'Error generating PDF: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

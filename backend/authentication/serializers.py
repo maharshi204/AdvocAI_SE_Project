@@ -398,3 +398,133 @@ class AddPasswordSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['new_password2']:
             raise serializers.ValidationError({"new_password": "New passwords didn't match."})
         return attrs
+
+
+class ChatMessageSerializer(serializers.Serializer):
+    """Serializer for chat messages"""
+
+    id = serializers.CharField(read_only=True)
+    sender = serializers.SerializerMethodField()
+    message = serializers.CharField()
+    message_type = serializers.CharField()
+    document_id = serializers.CharField(allow_blank=True)
+    document_title = serializers.CharField(allow_blank=True)
+    is_read = serializers.BooleanField()
+    created_at = serializers.DateTimeField()
+
+    def get_sender(self, obj):
+        from .models import User
+
+        try:
+            # Try to get sender attributes directly
+            if hasattr(obj, 'sender') and obj.sender:
+                sender = obj.sender
+                if hasattr(sender, 'id'):
+                    return {
+                        'id': str(sender.id),
+                        'name': sender.name or sender.username or 'Unknown',
+                        'username': sender.username or 'unknown',
+                    }
+            if hasattr(obj, 'sender_id') and obj.sender_id:
+                sender = User.objects(id=obj.sender_id).first()
+                if sender:
+                    return {
+                        'id': str(sender.id),
+                        'name': sender.name or sender.username or 'Unknown',
+                        'username': sender.username or 'unknown',
+                    }
+        except Exception as e:
+            print(f"Error getting sender: {e}")
+        return {'id': 'unknown', 'name': 'Unknown', 'username': 'unknown'}
+
+    def to_representation(self, instance):
+        """Ensure keys serialize cleanly"""
+
+        data = super().to_representation(instance)
+        result = {}
+        for key, value in data.items():
+            key = str(key)
+            if hasattr(value, 'isoformat'):
+                result[key] = value.isoformat() if value else None
+            elif isinstance(value, dict):
+                result[key] = {str(nested_key): nested_value for nested_key, nested_value in value.items()}
+            else:
+                result[key] = value
+        return result
+
+
+class ChatConversationSerializer(serializers.Serializer):
+    """Serializer for chat conversations"""
+
+    id = serializers.CharField(read_only=True)
+    connection_request_id = serializers.SerializerMethodField()
+    client = serializers.SerializerMethodField()
+    lawyer = serializers.SerializerMethodField()
+    is_active = serializers.BooleanField()
+    created_at = serializers.DateTimeField()
+    updated_at = serializers.DateTimeField()
+    last_message = serializers.SerializerMethodField()
+    unread_count = serializers.SerializerMethodField()
+
+    def _serialize_user(self, user):
+        if not user:
+            return {'id': 'unknown', 'name': 'Unknown', 'username': 'unknown'}
+        return {
+            'id': str(user.id),
+            'name': user.name or user.username or 'Unknown',
+            'username': user.username or 'unknown',
+        }
+
+    def get_client(self, obj):
+        return self._serialize_user(getattr(obj, 'client', None))
+
+    def get_lawyer(self, obj):
+        return self._serialize_user(getattr(obj, 'lawyer', None))
+
+    def get_connection_request_id(self, obj):
+        connection_request = getattr(obj, 'connection_request', None)
+        return str(connection_request.id) if connection_request else None
+
+    def get_last_message(self, obj):
+        from .models import ChatMessage
+
+        try:
+            last_message = ChatMessage.objects(conversation=obj).order_by('-created_at').first()
+            if last_message:
+                serializer = ChatMessageSerializer(last_message, context=self.context)
+                return serializer.data
+        except Exception as exc:
+            print(f"Error fetching last message for conversation {obj.id}: {exc}")
+        return None
+
+    def get_unread_count(self, obj):
+        from .models import ChatMessage
+
+        try:
+            queryset = ChatMessage.objects(conversation=obj, is_read=False)
+            request = self.context.get('request') if hasattr(self, 'context') else None
+            if request and getattr(request, 'user', None):
+                user_id = str(request.user.id)
+                return sum(1 for message in queryset if str(message.sender.id) != user_id)
+            return queryset.count()
+        except Exception as exc:
+            print(f"Error calculating unread count for conversation {obj.id}: {exc}")
+            return 0
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['id'] = str(getattr(instance, 'id', data.get('id')))
+        data['created_at'] = (
+            instance.created_at.isoformat() if getattr(instance, 'created_at', None) else None
+        )
+        data['updated_at'] = (
+            instance.updated_at.isoformat() if getattr(instance, 'updated_at', None) else None
+        )
+        return data
+
+
+class LawyerConnectionStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=['accepted', 'declined'])
+    message = serializers.CharField(required=False, allow_blank=True)
+
+

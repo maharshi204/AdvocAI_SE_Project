@@ -8,7 +8,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.conf import settings
 from mongoengine import DoesNotExist
-from .models import User, LawyerProfile, LawyerConnectionRequest
+from .models import User, LawyerProfile, LawyerConnectionRequest, ChatConversation, ChatMessage
 import random
 import cloudinary
 import cloudinary.uploader
@@ -29,6 +29,8 @@ from .serializers import (
     ChangePasswordSerializer,
     AddPasswordSerializer,
     LawyerConnectionStatusSerializer,
+    ChatConversationSerializer,
+    ChatMessageSerializer,
 )
 from datetime import datetime
 from uuid import uuid4
@@ -796,3 +798,137 @@ def add_password_view(request):
         return Response({"message": "Password added successfully."}, status=status.HTTP_200_OK)
     print("AddPasswordSerializer errors:", serializer.errors) # Debugging line
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def chat_conversations_list_view(request):
+    """List chat conversations for the authenticated user"""
+
+    user = request.user
+    connection_request_id = request.query_params.get('connection_request_id')
+
+    if connection_request_id:
+        try:
+            connection_request = LawyerConnectionRequest.objects(id=connection_request_id).first()
+            if not connection_request:
+                return Response({'error': 'Connection request not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            conversation = ChatConversation.objects(
+                connection_request=connection_request,
+                is_active=True,
+            ).first()
+        except Exception as exc:
+            return Response({'error': f'Invalid connection request ID: {str(exc)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not conversation:
+            if connection_request.status != 'accepted':
+                return Response({'error': 'Connection request is not accepted yet.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            conversation = ChatConversation.objects.create(
+                connection_request=connection_request,
+                client=connection_request.client,
+                lawyer=connection_request.lawyer,
+                is_active=True,
+            )
+            ChatMessage.objects.create(
+                conversation=conversation,
+                sender=request.user,
+                message='Conversation started.',
+                message_type='system',
+            )
+
+        if not conversation:
+            return Response({'error': 'Conversation not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if str(conversation.client.id) != str(user.id) and str(conversation.lawyer.id) != str(user.id):
+            return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ChatConversationSerializer(conversation, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    all_conversations = ChatConversation.objects(is_active=True).order_by('-updated_at')
+    user_conversations = []
+    user_id_str = str(user.id)
+
+    for conversation in all_conversations:
+        try:
+            client_id = str(conversation.client.id) if conversation.client else None
+            lawyer_id = str(conversation.lawyer.id) if conversation.lawyer else None
+
+            if client_id == user_id_str or lawyer_id == user_id_str:
+                user_conversations.append(conversation)
+        except Exception as exc:
+            print(f"Error processing conversation {conversation.id}: {exc}")
+            continue
+
+    serializer = ChatConversationSerializer(user_conversations, many=True, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def chat_messages_view(request, conversation_id):
+    """Retrieve or create chat messages"""
+
+    conversation = ChatConversation.objects(id=conversation_id).first()
+    if not conversation:
+        return Response({'error': 'Conversation not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+    if str(conversation.client.id) != str(user.id) and str(conversation.lawyer.id) != str(user.id):
+        return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'GET':
+        messages = ChatMessage.objects(conversation=conversation).order_by('created_at')
+        print(f"Found {messages.count()} messages for conversation {conversation_id}")
+
+        serializer = ChatMessageSerializer(messages, many=True)
+        print(f"Serialized {len(serializer.data)} messages")
+
+        unread_messages = ChatMessage.objects(
+            conversation=conversation,
+            is_read=False,
+        )
+        for message in unread_messages:
+            if str(message.sender.id) != str(user.id):
+                message.is_read = True
+                message.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    message_text = request.data.get('message', '').strip()
+    message_type = request.data.get('message_type', 'text')
+    document_id = request.data.get('document_id', '')
+    document_title = request.data.get('document_title', '')
+
+    if not message_text and message_type != 'document':
+        return Response({'error': 'Message cannot be empty.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if message_type == 'document' and not document_id:
+        return Response({'error': 'Document ID is required for document messages.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        chat_message = ChatMessage.objects.create(
+            conversation=conversation,
+            sender=user,
+            message=message_text or f'Shared document: {document_title}',
+            message_type=message_type,
+            document_id=document_id,
+            document_title=document_title,
+            is_read=False,
+        )
+        print(f"Created message {chat_message.id} in conversation {conversation_id}")
+        print(f"Message content: {chat_message.message}")
+        print(f"Sender: {chat_message.sender.id}")
+
+        conversation.save()
+
+        serializer = ChatMessageSerializer(chat_message)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Exception as exc:
+        print(f"Error creating message: {exc}")
+        import traceback
+
+        traceback.print_exc()
+        return Response({'error': f'Failed to create message: {str(exc)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
