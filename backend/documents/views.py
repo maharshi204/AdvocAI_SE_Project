@@ -16,6 +16,123 @@ from ai_generator.utils import get_gemini_response # Import the AI generation fu
 from .comment_mongo_client import get_comments_for_document, add_comment, serialize_comment
 
 
+@api_view(['POST'])
+def create_conversation_with_chat(request):
+    """
+    Creates a new conversation based on an initial chat message and generates
+    the first version of the document using AI.
+    """
+    message = request.data.get('message')
+    initial_document_content = request.data.get('document_content', '') # Can be empty for initial creation
+    
+    if not message:
+        return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Generate AI response for the initial message
+        ai_raw_response = get_gemini_response(message, initial_document_content)
+        
+        # Parse the AI response to extract document content
+        ai_response_content = ""
+        if '```json' in ai_raw_response:
+            json_str = ai_raw_response.split('```json')[1].split('```')[0]
+            document_data = json.loads(json_str)
+            ai_response_content = document_data.get('text', '')
+        else:
+            ai_response_content = ai_raw_response # If not JSON, treat raw response as content
+
+        # Determine a title for the new document (can be improved)
+        title = message[:50] + "..." if len(message) > 50 else message
+        if not title:
+            title = "New Document"
+
+        # Prepare messages for saving
+        messages = [
+            {'sender': 'user', 'text': message},
+            {'sender': 'bot', 'text': ai_raw_response} # Save raw AI response to messages
+        ]
+
+        # Save the new conversation
+        conversation_id = save_conversation(
+            title=title,
+            messages=messages,
+            initial_document_content=ai_response_content, # AI's parsed response is the initial document content
+            uploaded_by=(request.user.username if request.user.is_authenticated else 'anonymous'),
+            notes='Initial document generation via chat'
+        )
+
+        if conversation_id:
+            return Response({
+                'conversation_id': conversation_id,
+                'response': ai_raw_response,
+                'updated_document_content': ai_response_content,
+                'title': title
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error': 'Failed to create conversation'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        print(f"Error creating conversation with chat: {e}")
+        import traceback
+        traceback.print_exc()
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+def send_chat_message(request, pk):
+    """
+    Sends a chat message to an existing conversation, generates an AI response,
+    and updates the conversation's messages and document content.
+    """
+    message = request.data.get('message')
+    document_content = request.data.get('document_content') # Current document content as context
+
+    if not message:
+        return Response({'error': 'Message is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    conversation = get_conversation_by_id(pk)
+    if not conversation:
+        return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        # Generate AI response
+        ai_raw_response = get_gemini_response(message, document_content)
+
+        # Parse the AI response to extract document content
+        ai_response_content = ""
+        if '```json' in ai_raw_response:
+            json_str = ai_raw_response.split('```json')[1].split('```')[0]
+            document_data = json.loads(json_str)
+            ai_response_content = document_data.get('text', '')
+        else:
+            ai_response_content = ai_raw_response # If not JSON, treat raw response as content
+
+        # Update messages
+        updated_messages = conversation.get('messages', [])
+        updated_messages.append({'sender': 'user', 'text': message})
+        updated_messages.append({'sender': 'bot', 'text': ai_raw_response}) # Save raw AI response to messages
+
+        # Update conversation in DB
+        success = update_conversation(
+            pk,
+            conversation.get('title'), # Keep existing title
+            updated_messages,
+            ai_response_content, # AI's parsed response is the new document content
+            uploaded_by=(request.user.username if request.user.is_authenticated else 'anonymous'),
+            notes='Document update via chat message'
+        )
+
+        if success:
+            return Response({
+                'response': ai_raw_response,
+                'updated_document_content': ai_response_content
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to update conversation'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        print(f"Error sending chat message: {e}")
+        import traceback
+        traceback.print_exc()
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 @api_view(['GET', 'POST'])
 def conversation_list(request):
     """
