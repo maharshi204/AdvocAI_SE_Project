@@ -133,7 +133,55 @@ def send_chat_message(request, pk):
         traceback.print_exc()
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 @api_view(['GET', 'POST'])
+
+@parser_classes([JSONParser])
+def document_comments(request, document_id):
+    if request.method == 'GET':
+        try:
+            comments = get_comments_for_document(document_id)
+            import json
+            json_comments = json.dumps(comments)
+            return Response(json.loads(json_comments))
+        except Exception as e:
+            import traceback
+            print(f"Error getting comments for document_id {document_id}: {e}")
+            traceback.print_exc()
+            return Response({'error': 'Failed to load comments. Please check server logs for details.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    elif request.method == 'POST':
+        try:
+            user = request.user.username if request.user.is_authenticated else 'anonymous'
+            content = request.data.get('content')
+            position = request.data.get('position')
+            parent_comment_id = request.data.get('parent_comment')
+
+            if not content:
+                return Response({'error': 'Comment content is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            new_comment_doc = add_comment(document_id, user, content, position, parent_comment_id)
+            
+            if new_comment_doc:
+                serialized_comment = serialize_comment(new_comment_doc)
+                # Send WebSocket message to the document group
+                channel_layer = get_channel_layer()
+                document_group_name = f'document_{document_id}'
+                async_to_sync(channel_layer.group_send)(
+                    document_group_name,
+                    {
+                        'type': 'new_comment',
+                        'comment': serialized_comment
+                    }
+                )
+                return Response(serialized_comment, status=status.HTTP_201_CREATED)
+            return Response({'error': 'Failed to create comment'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            print(f"Error creating comment: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 def conversation_list(request):
     """
     List all conversations or create a new one.
