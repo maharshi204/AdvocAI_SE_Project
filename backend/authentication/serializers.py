@@ -592,6 +592,39 @@ class LawyerConnectionRequestSerializer(serializers.Serializer):
             'created_at': instance.created_at.isoformat() if instance.created_at else None,
             'updated_at': instance.updated_at.isoformat() if instance.updated_at else None,
         }
+        
+class ChatMessageSerializer(serializers.Serializer):
+    """Serializer for chat messages"""
+    id = serializers.CharField(read_only=True)
+    sender = serializers.SerializerMethodField()
+    message = serializers.CharField()
+    message_type = serializers.CharField()
+
+    def get_sender(self, obj):
+        from .models import User
+        try:
+            # Try to get sender from the object
+            if hasattr(obj, 'sender') and obj.sender:
+                sender = obj.sender
+                # If it's a reference, fetch it
+                if hasattr(sender, 'id'):
+                    return {
+                        'id': str(sender.id),
+                        'name': sender.name or sender.username or 'Unknown',
+                        'username': sender.username or 'unknown',
+                    }
+            # Fallback: try to get by ID if sender is stored as ID
+            if hasattr(obj, 'sender_id') and obj.sender_id:
+                sender = User.objects(id=obj.sender_id).first()
+                if sender:
+                    return {
+                        'id': str(sender.id),
+                        'name': sender.name or sender.username or 'Unknown',
+                        'username': sender.username or 'unknown',
+                    }
+        except Exception as e:
+            print(f"Error getting sender: {e}")
+        return {'id': 'unknown', 'name': 'Unknown', 'username': 'unknown'}
 
 
 
