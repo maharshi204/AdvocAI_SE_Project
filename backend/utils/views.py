@@ -220,6 +220,43 @@ def lawyer_connection_update_view(request, connection_id):
     connection_request.status = new_status
     connection_request.message = serializer.validated_data.get('message', connection_request.message)
     connection_request.save()
+     if new_status == 'accepted':
+        existing_chat = ChatConversation.objects(
+            connection_request=connection_request
+        ).first()
+        if not existing_chat:
+            try:
+                chat_conversation = ChatConversation.objects.create(
+                    connection_request=connection_request,
+                    client=connection_request.client,
+                    lawyer=connection_request.lawyer,
+                    is_active=True,
+                )
+                print(f"Created chat conversation {chat_conversation.id} for connection {connection_request.id}")
+                
+                # Send welcome message
+                welcome_msg = f"Connection accepted! You can now chat with {connection_request.client.name or connection_request.client.username}."
+                ChatMessage.objects.create(
+                    conversation=chat_conversation,
+                    sender=request.user,
+                    message=welcome_msg,
+                    message_type='system',
+                )
+                print(f"Created welcome message for conversation {chat_conversation.id}")
+            except Exception as e:
+                print(f"Error creating chat conversation: {e}")
+                import traceback
+                traceback.print_exc()
+
+    response_serializer = LawyerConnectionRequestSerializer(connection_request)
+    return Response({
+        'message': f'Connection request {new_status}.',
+        'request': response_serializer.data,
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
     
 @api_view(['GET'])
 def download_latest_conversation_pdf(request, pk):
