@@ -174,6 +174,32 @@ def upload_signature(request):
     except Exception as e:
         return Response({'error': str(e)}, status=500)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def lawyer_dashboard_view(request):
+    """Return dashboard information for a lawyer"""
+    if not request.user.is_lawyer:
+        return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    profile = LawyerProfile.objects(user=request.user).first()
+    profile_data = LawyerProfileSerializer(profile).data if profile else None
+
+    connection_requests = LawyerConnectionRequest.objects(lawyer=request.user).order_by('-created_at')
+    connection_serializer = LawyerConnectionRequestSerializer(connection_requests, many=True)
+
+    summary = {
+        'total_requests': connection_requests.count(),
+        'pending_requests': connection_requests.filter(status='pending').count(),
+        'accepted_requests': connection_requests.filter(status='accepted').count(),
+        'declined_requests': connection_requests.filter(status='declined').count(),
+    }
+
+    return Response({
+        'profile': profile_data,
+        'user': UserSerializer(request.user).data,
+        'connections': connection_serializer.data,
+        'summary': summary,
+    }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def download_latest_conversation_pdf(request, pk):
