@@ -200,7 +200,27 @@ def lawyer_dashboard_view(request):
         'connections': connection_serializer.data,
         'summary': summary,
     }, status=status.HTTP_200_OK)
+    
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def lawyer_connection_update_view(request, connection_id):
+    """Allow lawyer to update connection request status"""
+    if not request.user.is_lawyer:
+        return Response({'error': 'Access denied.'}, status=status.HTTP_403_FORBIDDEN)
 
+    connection_request = LawyerConnectionRequest.objects(id=connection_id, lawyer=request.user).first()
+    if not connection_request:
+        return Response({'error': 'Connection request not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = LawyerConnectionStatusSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    new_status = serializer.validated_data['status']
+    connection_request.status = new_status
+    connection_request.message = serializer.validated_data.get('message', connection_request.message)
+    connection_request.save()
+    
 @api_view(['GET'])
 def download_latest_conversation_pdf(request, pk):
     """
