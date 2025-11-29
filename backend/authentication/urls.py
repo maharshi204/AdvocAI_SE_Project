@@ -37,4 +37,9 @@ urlpatterns = [
     path('lawyer/connections/<str:connection_id>/', lawyer_connection_update_view, name='lawyer_connection_update'),
     path('change-password/', change_password_view, name='change_password'),
     path('add-password/', add_password_view, name='add_password'),
+    path('admin/lawyers/', admin_lawyer_list_view, name='admin_lawyer_list'),
+    path('admin/lawyers/<str:lawyer_id>/verify/', admin_lawyer_verify_view, name='admin_lawyer_verify'),
+    path('admin/users/promote/', admin_promote_user_view, name='admin_promote_user'),
+    path('admin/users/create-admin/', admin_create_admin_user_view, name='admin_create_admin_user'),
+
 ]
