@@ -38,6 +38,9 @@ export default function Navbar() {
   if (isAuthenticated && user?.role === 'lawyer') {
     navLinks.push({ to: "/lawyer-dashboard", label: "Lawyer Dashboard", requiresAuth: true });
   }
+   if (isAuthenticated && user?.role === 'admin') {
+    navLinks.push({ to: "/admin-dashboard", label: "Admin Dashboard", requiresAuth: true });
+  }
 
   return (
     <nav className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b py-4 border-border shadow-lg shadow-black/20 h-[var(--navbar-height)]">
