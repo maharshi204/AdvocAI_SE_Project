@@ -112,6 +112,14 @@ function AppContent() {
               </ProtectedRoute>
             )}
           />
+          <Route
+            path="/admin-dashboard"
+            element={(
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            )}
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} /> {/* Added ForgotPassword route */}
